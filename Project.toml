@@ -1,0 +1,10 @@
+name = "TensorPolynomialBases"
+uuid = "f77b161d-e03a-5d68-b365-d5306aabeaa6"
+authors = ["fverdugo <fverdugo@cimne.upc.edu>"]
+version = "0.1.0"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
