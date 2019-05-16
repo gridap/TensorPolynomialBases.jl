@@ -22,7 +22,8 @@ V = SVector{3,Float64} # type of the value
 basis = FixedPolynomialBasis{T,V}(filter,order,dim)
 
 # Evaluation
-cache = SratchData(basis)
+x = rand(3)
+cache = ScratchData(basis)
 v = zeros(V,length(basis))
 evaluate!(v,basis,x,cache) # No memory allocation here
 @show v
