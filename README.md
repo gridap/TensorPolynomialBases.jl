@@ -17,7 +17,20 @@ filter(e,order) = sum(e) <= order
 order= 4
 dim = 2
 T = Float64 # type of the variables
-V = SVector{3,Float64}
-basis = FixedPolynomialBasis{Float64,SVector{3,Float64}}(filter,order,dim)
+V = SVector{3,Float64} # type of the value
 
+basis = FixedPolynomialBasis{T,V}(filter,order,dim)
+
+# Evaluation
+cache = SratchData(basis)
+v = zeros(V,length(basis))
+evaluate!(v,basis,x,cache) # No memory allocation here
+@show v
+
+# Evaluation of the gradient
+G = gradient_type(basis)
+# G == SMatrix{2,3,T,6}
+v = zeros(G,length(basis))
+gradient!(v,basis,x,cache) # No memory allocation here
+@show v
 ```
