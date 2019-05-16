@@ -19,12 +19,34 @@ x = [1.0,2.0]
 @test fp.jacobian(B,x,cfg) ≈ [0.0 0.0; 1.0 0.0; 2.0 0.0; 3.0 0.0; 0.0 1.0;
                      2.0 1.0; 4.0 1.0; 0.0 4.0; 4.0 4.0; 0.0 12.0]
 
-#order = 3
-#basis = FixedPolynomialBasis{T,SVector{Z,T}}(filter,order)
 
 @test gradient_type(SVector{3,Int},Val(2)) == SMatrix{2,3,Int,6}
 
 @test gradient_type(SMatrix{3,4,Int},Val(2)) == SArray{Tuple{2,3,4},Int,3,24}
+
+order = 1
+dims = 2
+
+filter(e,O) = true
+
+T = Float64
+V = SVector{3,Float64}
+basis = FixedPolynomialBasis{T,V}(filter,order,dim)
+
+n = length(basis)
+v = zeros(V,n)
+G = gradient_type(basis)
+w = zeros(G,n)
+x = SVector(2.0,3.0)
+
+cache = ScratchData(basis)
+
+evaluate!(v,basis,x,cache)
+
+gradient!(w,basis,x,cache)
+
+@show v
+@show w
 
 
 end # module TensorPolynomialBasesTests
