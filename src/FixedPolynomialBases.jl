@@ -28,26 +28,31 @@ end
 """
 Scratch data associated with FixedPolynomialBasis
 """
-struct FixedScratchData{T,C<:fp.JacobianConfig}
+struct FixedScratchData{T,V,G,C<:fp.JacobianConfig}
   cfg::C
   value::Vector{T}
   jacob::Matrix{T}
+  v::Vector{V}
+  g::Vector{G}
 end
 
-function FixedScratchData(system::fp.System{T}) where T
+function (::Type{FixedScratchData{T,V,G}})(system::fp.System{T}) where {T,V,G}
   cfg = fp.JacobianConfig(system)
   n = length(system)
   d = fp.nvariables(system)
   value = zeros(T,n)
   jacob = zeros(T,(n,d))
-  FixedScratchData(cfg,value,jacob)
+  m = length(zero(V))*n
+  v = zeros(V,m)
+  g = zeros(G,m)
+  FixedScratchData(cfg,value,jacob,v,g)
 end
 
 """
 Implementation of a tensor-valued multivariate polynomial basis
 using the functionality given by the package FixedPolynomials
 """
-struct FixedPolynomialBasis{T,V,G}
+struct FixedPolynomialBasis{T,V,G} <: TensorPolynomialBasis{T,V,G}
   system::fp.System{T}
 end
 
@@ -71,21 +76,17 @@ function (::Type{FixedPolynomialBasis{T,V,G}})(
   FixedPolynomialBasis{T,V,G}(system)
 end
 
-gradient_type(::FixedPolynomialBasis{T,V,G}) where {T,V,G} = G
-
-value_type(::FixedPolynomialBasis{T,V,G}) where {T,V,G} = V
-
-coeff_type(::FixedPolynomialBasis{T,V,G}) where {T,V,G} = T
-
 function length(b::FixedPolynomialBasis{T,V}) where {T,V}
   length(zero(V)) * length(b.system)
 end
 
 ndims(b::FixedPolynomialBasis) = nvariables(b.system)
 
-function ScratchData(b::FixedPolynomialBasis)
-  FixedScratchData(b.system)
+function ScratchData(b::FixedPolynomialBasis{T,V,G}) where {T,V,G}
+  FixedScratchData{T,V,G}(b.system)
 end
+
+# Single-point versions of evaluate! and gradient!
 
 function evaluate!(
   v::AbstractVector{V},
@@ -124,6 +125,40 @@ function gradient!(
 
   fp.jacobian!(cache.jacob,b.system,x,cache.cfg)
   _fill_gradient_scalar!(v,cache.jacob)
+end
+
+# Vectorized versions of evaluate! and gradient!
+
+function evaluate!(
+  v::AbstractMatrix{V},
+  b::FixedPolynomialBasis{T,V},
+  x::AbstractVector{<:AbstractVector{T}},
+  cache::FixedScratchData{T,V}) where {T,V}
+
+  vi = cache.v
+  n = length(vi)
+  for (i,xi) in enumerate(x)
+    evaluate!(vi,b,xi,cache)
+    for j in 1:n
+      v[j,i] = vi[j]
+    end
+  end
+end
+
+function gradient!(
+  v::AbstractMatrix{G},
+  b::FixedPolynomialBasis{T,V,G},
+  x::AbstractVector{<:AbstractVector{T}},
+  cache::FixedScratchData{T,V,G}) where {T,V,G}
+
+  vi = cache.g
+  n = length(vi)
+  for (i,xi) in enumerate(x)
+    gradient!(vi,b,xi,cache)
+    for j in 1:n
+      v[j,i] = vi[j]
+    end
+  end
 end
 
 function _fill_value!(

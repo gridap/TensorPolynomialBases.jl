@@ -18,3 +18,9 @@ end
 
 _mutable(::Type{SArray{S,T,N,L}}) where {S,T,N,L} = MArray{S,T,N,L}
 
+macro abstractmethod()
+  quote
+    error("This function belongs to an interface definition and cannot be used.")
+  end
+end
+

@@ -46,6 +46,12 @@ r = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [2.0, 0.0, 0.0],
 
 @test v == r
 
+v = evaluate(basis,x,cache)
+
+@test v == r
+
+@test evaluate(basis,[x,x],cache) == hcat(v,v)
+
 r = [[0.0 0.0 0.0; 0.0 0.0 0.0], [0.0 0.0 0.0; 0.0 0.0 0.0],
      [0.0 0.0 0.0; 0.0 0.0 0.0], [1.0 0.0 0.0; 0.0 0.0 0.0],
      [0.0 1.0 0.0; 0.0 0.0 0.0], [0.0 0.0 1.0; 0.0 0.0 0.0],
@@ -54,6 +60,12 @@ r = [[0.0 0.0 0.0; 0.0 0.0 0.0], [0.0 0.0 0.0; 0.0 0.0 0.0],
      [0.0 3.0 0.0; 0.0 2.0 0.0], [0.0 0.0 3.0; 0.0 0.0 2.0]]
 
 @test w == r
+
+w = gradient(basis,x,cache)
+
+@test w == r
+
+@test gradient(basis,[x,x],cache) == hcat(w,w)
 
 T = Float64
 basis = FixedPolynomialBasis{T,T,SVector{dim,T}}(filter,order,dim)
