@@ -45,8 +45,43 @@ evaluate!(v,basis,x,cache)
 
 gradient!(w,basis,x,cache)
 
-@show v
-@show w
+r = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [2.0, 0.0, 0.0],
+     [0.0, 2.0, 0.0], [0.0, 0.0, 2.0], [3.0, 0.0, 0.0], [0.0, 3.0, 0.0],
+     [0.0, 0.0, 3.0], [6.0, 0.0, 0.0], [0.0, 6.0, 0.0], [0.0, 0.0, 6.0]]
 
+@test v == r
+
+r = [[0.0 0.0 0.0; 0.0 0.0 0.0], [0.0 0.0 0.0; 0.0 0.0 0.0],
+     [0.0 0.0 0.0; 0.0 0.0 0.0], [1.0 0.0 0.0; 0.0 0.0 0.0],
+     [0.0 1.0 0.0; 0.0 0.0 0.0], [0.0 0.0 1.0; 0.0 0.0 0.0],
+     [0.0 0.0 0.0; 1.0 0.0 0.0], [0.0 0.0 0.0; 0.0 1.0 0.0],
+     [0.0 0.0 0.0; 0.0 0.0 1.0], [3.0 0.0 0.0; 2.0 0.0 0.0],
+     [0.0 3.0 0.0; 0.0 2.0 0.0], [0.0 0.0 3.0; 0.0 0.0 2.0]]
+
+@test w == r
+
+T = Float64
+basis = FixedPolynomialBasis{T,T,SVector{dim,T}}(filter,order,dim)
+
+n = length(basis)
+V = value_type(basis)
+v = zeros(V,n)
+G = gradient_type(basis)
+w = zeros(G,n)
+x = SVector(2.0,3.0)
+
+cache = ScratchData(basis)
+
+evaluate!(v,basis,x,cache)
+
+gradient!(w,basis,x,cache)
+
+r = [1.0, 2.0, 3.0, 6.0]
+
+@test v == r
+
+r = [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [3.0, 2.0]]
+
+@test w == r
 
 end # module TensorPolynomialBasesTests

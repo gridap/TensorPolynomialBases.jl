@@ -8,11 +8,38 @@ export FixedPolynomialBasis, ScratchData
 export gradient_type, value_type, coeff_type
 export evaluate!, gradient!
 import Base: length, ndims
+import FixedPolynomials: System
+
+# Utils
+
+function gradient_type(::Type{A},::Val{D}) where A<:StaticArray{S,T,N} where {S,T,N,D}
+  SG = _gradient_size(Size(A),Val(D))
+  TG = T
+  NG = N+1
+  LG = _gradient_length(Size(A),Val(D))
+  SArray{SG,TG,NG,LG}
+end
+
+@generated function _gradient_size(::Size{B},::Val{D}) where {B,D}
+  str = join(["$b," for b in B])
+  Meta.parse("Tuple{$D,$str}")
+end
+
+function _gradient_length(::Size{B},::Val{D}) where {B,D}
+  prod((D,B...))
+end
+
+_mutable(::Type{SArray{S,T,N,L}}) where {S,T,N,L} = MArray{S,T,N,L}
+
+# Interface
+
+
+# FixedPolynomialBasis
 
 """
 Create a FixedPolynomials.System object representing a monomial basis. 
 """
-function (::Type{fp.System{T}})(filter::Function, order::Int, dim::Int) where T
+function (::Type{System{T}})(filter::Function, order::Int, dim::Int) where T
   B = _setup_system(filter,order,dim,T)
 end
 
@@ -63,14 +90,29 @@ end
 
 """
 Generates a `FixedPolynomialBasis` object, whose coefficients
-are of type `T` and the value of typ `V`
+are of type `T` and the value of type `V`
 """
 function (::Type{FixedPolynomialBasis{T,V}})(
   filter::Function,order::Int,dim::Int) where {T,V}
-  system = fp.System{T}(filter,order,dim)
   G = gradient_type(V,Val(dim))
+  FixedPolynomialBasis{T,V,G}(filter,order,dim)
+end
+
+"""
+Generates a `FixedPolynomialBasis` object, whose coefficients
+are of type `T`, the value of type `V`, and the gradient of type G
+"""
+function (::Type{FixedPolynomialBasis{T,V,G}})(
+  filter::Function,order::Int,dim::Int) where {T,V,G}
+  system = fp.System{T}(filter,order,dim)
   FixedPolynomialBasis{T,V,G}(system)
 end
+
+gradient_type(::FixedPolynomialBasis{T,V,G}) where {T,V,G} = G
+
+value_type(::FixedPolynomialBasis{T,V,G}) where {T,V,G} = V
+
+coeff_type(::FixedPolynomialBasis{T,V,G}) where {T,V,G} = T
 
 function length(b::FixedPolynomialBasis{T,V}) where {T,V}
   length(zero(V)) * length(b.system)
@@ -92,6 +134,15 @@ function evaluate!(
   _fill_value!(v,cache.value)
 end
 
+function evaluate!(
+  v::AbstractVector{T},
+  b::FixedPolynomialBasis{T,T},
+  x::AbstractVector{T},
+  cache::FixedScratchData{T}) where T
+
+  fp.evaluate!(v,b.system,x,cache.cfg)
+end
+
 function gradient!(
   v::AbstractVector{G},
   b::FixedPolynomialBasis{T,V,G},
@@ -100,6 +151,16 @@ function gradient!(
 
   fp.jacobian!(cache.jacob,b.system,x,cache.cfg)
   _fill_gradient!(v,cache.jacob,V)
+end
+
+function gradient!(
+  v::AbstractVector{G},
+  b::FixedPolynomialBasis{T,T,G},
+  x::AbstractVector{T},
+  cache::FixedScratchData{T}) where {T,G}
+
+  fp.jacobian!(cache.jacob,b.system,x,cache.cfg)
+  _fill_gradient_scalar!(v,cache.jacob)
 end
 
 function _fill_value!(
@@ -138,29 +199,20 @@ function _fill_gradient!(
   end
 end
 
-function gradient_type(::Type{A},::Val{D}) where A<:StaticArray{S,T,N} where {S,T,N,D}
-  SG = _gradient_size(Size(A),Val(D))
-  TG = T
-  NG = N+1
-  LG = _gradient_length(Size(A),Val(D))
-  SArray{SG,TG,NG,LG}
+function _fill_gradient_scalar!(
+  v::AbstractVector{G},
+  s::AbstractMatrix{T}) where {T,G}
+
+  m = zero(_mutable(G))
+  k = 1
+  for i in 1:size(s,1)
+    m .= 0.0
+    for j in 1:size(s,2)
+      m[j] = s[i,j]
+      v[k] = m
+    end
+    k += 1
+  end
 end
-
-gradient_type(::FixedPolynomialBasis{T,V,G}) where {T,V,G} = G
-
-value_type(::FixedPolynomialBasis{T,V,G}) where {T,V,G} = V
-
-coeff_type(::FixedPolynomialBasis{T,V,G}) where {T,V,G} = T
-
-@generated function _gradient_size(::Size{B},::Val{D}) where {B,D}
-  str = join(["$b," for b in B])
-  Meta.parse("Tuple{$D,$str}")
-end
-
-function _gradient_length(::Size{B},::Val{D}) where {B,D}
-  prod((D,B...))
-end
-
-_mutable(::Type{SArray{S,T,N,L}}) where {S,T,N,L} = MArray{S,T,N,L}
 
 end # module
