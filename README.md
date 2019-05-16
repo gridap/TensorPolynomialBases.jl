@@ -10,6 +10,8 @@ The **TensorPolynomialBases** package provides a collection of different types r
 ### Create a vector-valued monomial basis of P-polynomials in 2 variables
 
 ```julia
+using TensorPolynomialBases
+using StaticArrays
 
 # Define a filter to select the monomials in the P-space
 filter(e,order) = sum(e) <= order
