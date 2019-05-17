@@ -24,6 +24,7 @@ using StaticArrays
 using TensorValues
 
 export FixedPolynomialBasis, ScratchData
+export FastQMonomials
 export gradient_type, value_type, point_type
 export evaluate, gradient
 export evaluate!, gradient!
@@ -34,5 +35,7 @@ include("Utils.jl")
 include("Interfaces.jl")
 
 include("FixedPolynomialBases.jl")
+
+include("FastQMonomials.jl")
 
 end # module

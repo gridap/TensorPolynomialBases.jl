@@ -207,8 +207,8 @@ function _fill_gradient!(
       m .= 0.0
       for j in 1:size(s,2)
         m[j,l] = s[i,j]
-        v[k] = m
       end
+      v[k] = m
       k += 1
     end 
   end
@@ -224,8 +224,8 @@ function _fill_gradient_scalar!(
     m .= 0.0
     for j in 1:size(s,2)
       m[j] = s[i,j]
-      v[k] = m
     end
+    v[k] = m
     k += 1
   end
 end
