@@ -4,6 +4,7 @@ using TensorPolynomialBases
 using Test
 import FixedPolynomials; const fp = FixedPolynomials
 using StaticArrays
+using TensorValues
 
 filter(e,O) = (sum(e) <= O)
 
@@ -68,6 +69,17 @@ w = gradient(basis,x,cache)
 @test gradient(basis,[x,x],cache) == hcat(w,w)
 
 T = Float64
+V = VectorValue{3,T}
+basis = FixedPolynomialBasis{T,V}(filter,order,dim)
+G = gradient_type(basis)
+
+cache = ScratchData(basis)
+
+@test evaluate(basis,x,cache) == reinterpret(V,v)
+
+@test gradient(basis,x,cache) == reinterpret(G,w)
+
+T = Float64
 basis = FixedPolynomialBasis{T,T,SVector{dim,T}}(filter,order,dim)
 
 n = length(basis)
@@ -90,5 +102,7 @@ r = [1.0, 2.0, 3.0, 6.0]
 r = [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [3.0, 2.0]]
 
 @test w == r
+
+
 
 end #module FixedPolynomialBasesTests
