@@ -17,14 +17,13 @@ using StaticArrays
 filter(e,order) = sum(e) <= order
 
 order= 4
-dim = 2
-T = Float64 # type of the variables
+P = SVector{2,Float64} # type of the evaluation point
 V = SVector{3,Float64} # type of the value
 
-basis = FixedPolynomialBasis{T,V}(filter,order,dim)
+basis = FixedPolynomialBasis{P,V}(filter,order)
 
 # Evaluation
-x = rand(3)
+x = @SVector rand(3)
 cache = ScratchData(basis)
 v = zeros(V,length(basis))
 evaluate!(v,basis,x,cache) # No memory allocation here
