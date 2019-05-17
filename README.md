@@ -22,9 +22,13 @@ V = SVector{3,Float64} # type of the value
 
 basis = FixedPolynomialBasis{P,V}(filter,order)
 
-# Evaluation
-x = @SVector rand(3)
+# Create scratch data that can be reused between evaluations
 cache = ScratchData(basis)
+
+# Evaluation point
+x = @SVector rand(3)
+
+# Evaluation
 v = zeros(V,length(basis))
 evaluate!(v,basis,x,cache) # No memory allocation here
 @show v
