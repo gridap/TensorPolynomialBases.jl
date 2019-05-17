@@ -2,7 +2,7 @@
 """
 Create a FixedPolynomials.System object representing a monomial basis. 
 """
-function (::Type{System{T}})(filter::Function, order::Int, dim::Int) where T
+function (::Type{fp.System{T}})(filter::Function, order::Int, dim::Int) where T
   B = _setup_system(filter,order,dim,T)
 end
 
@@ -23,6 +23,22 @@ function _setup_system(filter,O,D,T)
     end
   end
   fp.System(A)
+end
+
+function fp.evaluate!(
+  v::AbstractVector{T},
+  s::fp.System, 
+  x::VectorValue{D,T},
+  cfg::fp.JacobianConfig) where {D,T}
+  fp.evaluate!(v,s,x.array,cfg)
+end
+
+function fp.jacobian!(
+  v::AbstractMatrix{T},
+  s::fp.System, 
+  x::VectorValue{D,T},
+  cfg::fp.JacobianConfig) where {D,T}
+  fp.jacobian!(v,s,x.array,cfg)
 end
 
 """
@@ -52,37 +68,38 @@ end
 Implementation of a tensor-valued multivariate polynomial basis
 using the functionality given by the package FixedPolynomials
 """
-struct FixedPolynomialBasis{T,V,G} <: TensorPolynomialBasis{T,V,G}
+struct FixedPolynomialBasis{P,V,G,T} <: TensorPolynomialBasis{P,V,G}
   system::fp.System{T}
 end
 
 """
-Generates a `FixedPolynomialBasis` object, whose coefficients
-are of type `T` and the value of type `V`
+Generates a `FixedPolynomialBasis` object, to be evaluated at objects 
+of type `T` and has value of type `V`
 """
-function (::Type{FixedPolynomialBasis{T,V}})(
-  filter::Function,order::Int,dim::Int) where {T,V}
-  G = gradient_type(V,Val(dim))
-  FixedPolynomialBasis{T,V,G}(filter,order,dim)
+function (::Type{FixedPolynomialBasis{P,V}})(
+  filter::Function,order::Int) where {P,V}
+  G = _gradient_type(V,P)
+  FixedPolynomialBasis{P,V,G}(filter,order)
 end
 
 """
 Generates a `FixedPolynomialBasis` object, whose coefficients
 are of type `T`, the value of type `V`, and the gradient of type G
 """
-function (::Type{FixedPolynomialBasis{T,V,G}})(
-  filter::Function,order::Int,dim::Int) where {T,V,G}
-  system = fp.System{T}(filter,order,dim)
-  FixedPolynomialBasis{T,V,G}(system)
+function (::Type{FixedPolynomialBasis{P,V,G}})(
+  filter::Function, order::Int) where {P<:PointType{D},V,G} where D
+  T = eltype(P)
+  system = fp.System{T}(filter,order,D)
+  FixedPolynomialBasis{P,V,G,T}(system)
 end
 
-function length(b::FixedPolynomialBasis{T,V}) where {T,V}
+function length(b::FixedPolynomialBasis{P,V}) where {P,V}
   length(zero(V)) * length(b.system)
 end
 
 ndims(b::FixedPolynomialBasis) = nvariables(b.system)
 
-function ScratchData(b::FixedPolynomialBasis{T,V,G}) where {T,V,G}
+function ScratchData(b::FixedPolynomialBasis{P,V,G,T}) where {P,V,G,T}
   FixedScratchData{T,V,G}(b.system)
 end
 
@@ -90,9 +107,9 @@ end
 
 function evaluate!(
   v::AbstractVector{V},
-  b::FixedPolynomialBasis{T,V},
-  x::AbstractVector{T},
-  cache::FixedScratchData{T}) where {T,V}
+  b::FixedPolynomialBasis{P,V,G,T},
+  x::P,
+  cache::FixedScratchData{T}) where {P,V,G,T}
 
   fp.evaluate!(cache.value,b.system,x,cache.cfg)
   _fill_value!(v,cache.value)
@@ -100,18 +117,18 @@ end
 
 function evaluate!(
   v::AbstractVector{T},
-  b::FixedPolynomialBasis{T,T},
-  x::AbstractVector{T},
-  cache::FixedScratchData{T}) where T
+  b::FixedPolynomialBasis{P,T,G,T},
+  x::P,
+  cache::FixedScratchData{T}) where {P,G,T}
 
   fp.evaluate!(v,b.system,x,cache.cfg)
 end
 
 function gradient!(
   v::AbstractVector{G},
-  b::FixedPolynomialBasis{T,V,G},
-  x::AbstractVector{T},
-  cache::FixedScratchData{T}) where {T,V,G}
+  b::FixedPolynomialBasis{P,V,G,T},
+  x::P,
+  cache::FixedScratchData{T}) where {P,V,G,T}
 
   fp.jacobian!(cache.jacob,b.system,x,cache.cfg)
   _fill_gradient!(v,cache.jacob,V)
@@ -119,9 +136,9 @@ end
 
 function gradient!(
   v::AbstractVector{G},
-  b::FixedPolynomialBasis{T,T,G},
-  x::AbstractVector{T},
-  cache::FixedScratchData{T}) where {T,G}
+  b::FixedPolynomialBasis{P,T,G,T},
+  x::P,
+  cache::FixedScratchData{T}) where {P,G,T}
 
   fp.jacobian!(cache.jacob,b.system,x,cache.cfg)
   _fill_gradient_scalar!(v,cache.jacob)
@@ -131,9 +148,9 @@ end
 
 function evaluate!(
   v::AbstractMatrix{V},
-  b::FixedPolynomialBasis{T,V},
-  x::AbstractVector{<:AbstractVector{T}},
-  cache::FixedScratchData{T,V}) where {T,V}
+  b::FixedPolynomialBasis{P,V,G,T},
+  x::AbstractVector{P},
+  cache::FixedScratchData{T,V}) where {P,V,G,T}
 
   vi = cache.v
   n = length(vi)
@@ -147,9 +164,9 @@ end
 
 function gradient!(
   v::AbstractMatrix{G},
-  b::FixedPolynomialBasis{T,V,G},
-  x::AbstractVector{<:AbstractVector{T}},
-  cache::FixedScratchData{T,V,G}) where {T,V,G}
+  b::FixedPolynomialBasis{P,V,G,T},
+  x::AbstractVector{P},
+  cache::FixedScratchData{T,V,G}) where {P,V,G,T}
 
   vi = cache.g
   n = length(vi)

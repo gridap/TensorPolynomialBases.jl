@@ -24,11 +24,10 @@ using StaticArrays
 using TensorValues
 
 export FixedPolynomialBasis, ScratchData
-export gradient_type, value_type, coeff_type
+export gradient_type, value_type, point_type
 export evaluate, gradient
 export evaluate!, gradient!
 import Base: length, ndims
-import FixedPolynomials: System
 
 include("Utils.jl")
 

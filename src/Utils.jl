@@ -1,5 +1,6 @@
 
-function gradient_type(::Type{A},::Val{D}) where A<:StaticArray{S,T,N} where {S,T,N,D}
+function _gradient_type(
+  ::Type{A},::Type{<:SVector{D}}) where A<:StaticArray{S,T,N} where {S,T,N,D}
   SG = _gradient_size(Size(A),Val(D))
   TG = T
   NG = N+1
@@ -7,9 +8,18 @@ function gradient_type(::Type{A},::Val{D}) where A<:StaticArray{S,T,N} where {S,
   SArray{SG,TG,NG,LG}
 end
 
-function gradient_type(::Type{A},::Val{D}) where A<:MultiValue{S,T,N,L} where {S,T,N,L,D}
-  G = gradient_type(SArray{S,T,N,L},Val(D))
+function _gradient_type(
+  ::Type{A},::Type{<:VectorValue{D}}) where A<:MultiValue{S,T,N,L} where {S,T,N,L,D}
+  G = _gradient_type(SArray{S,T,N,L},SVector{D,T})
   _to_multivalue_type(G)
+end
+
+function _gradient_type(::Type{T},::Type{<:VectorValue{D}}) where {T<:Real,D}
+  VectorValue{D,T}
+end
+
+function _gradient_type(::Type{T},::Type{<:SVector{D}}) where {T<:Real,D}
+  SVector{D,T}
 end
 
 function _to_multivalue_type(::Type{SArray{S,T,N,L}}) where {S,T,N,L}

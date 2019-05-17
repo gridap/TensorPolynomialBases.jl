@@ -21,13 +21,12 @@ x = [1.0,2.0]
                      2.0 1.0; 4.0 1.0; 0.0 4.0; 4.0 4.0; 0.0 12.0]
 
 order = 1
-dims = 2
 
 filter(e,O) = true
 
-T = Float64
+P = SVector{2,Float64}
 V = SVector{3,Float64}
-basis = FixedPolynomialBasis{T,V}(filter,order,dim)
+basis = FixedPolynomialBasis{P,V}(filter,order)
 
 n = length(basis)
 v = zeros(V,n)
@@ -68,10 +67,11 @@ w = gradient(basis,x,cache)
 
 @test gradient(basis,[x,x],cache) == hcat(w,w)
 
-T = Float64
-V = VectorValue{3,T}
-basis = FixedPolynomialBasis{T,V}(filter,order,dim)
+P = VectorValue{2,Float64}
+V = VectorValue{3,Float64}
+basis = FixedPolynomialBasis{P,V}(filter,order)
 G = gradient_type(basis)
+x = VectorValue(2.0,3.0)
 
 cache = ScratchData(basis)
 
@@ -80,12 +80,14 @@ cache = ScratchData(basis)
 @test gradient(basis,x,cache) == reinterpret(G,w)
 
 T = Float64
-basis = FixedPolynomialBasis{T,T,SVector{dim,T}}(filter,order,dim)
+P = SVector{2,T}
+basis = FixedPolynomialBasis{P,T}(filter,order)
 
 n = length(basis)
 V = value_type(basis)
 v = zeros(V,n)
 G = gradient_type(basis)
+@test G == SVector{2,T}
 w = zeros(G,n)
 x = SVector(2.0,3.0)
 
@@ -103,6 +105,30 @@ r = [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [3.0, 2.0]]
 
 @test w == r
 
+T = Float64
+P = VectorValue{2,T}
+basis = FixedPolynomialBasis{P,T}(filter,order)
 
+n = length(basis)
+V = value_type(basis)
+v = zeros(V,n)
+G = gradient_type(basis)
+@test G == VectorValue{2,T}
+w = zeros(G,n)
+x = VectorValue(2.0,3.0)
+
+cache = ScratchData(basis)
+
+evaluate!(v,basis,x,cache)
+
+gradient!(w,basis,x,cache)
+
+r = [1.0, 2.0, 3.0, 6.0]
+
+@test v == r
+
+r = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 3.0, 2.0]
+
+@test w == reinterpret(G,r)
 
 end #module FixedPolynomialBasesTests
