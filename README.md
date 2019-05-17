@@ -50,7 +50,7 @@ using TensorValues
 filter(e,order) = sum( ( i for i in e if i>1 ) ) <= order
 
 order= 3
-P = VectorValue{2,Float64} # type of the evaluation point
+P = VectorValue{3,Float64} # type of the evaluation point
 V = TensorValue{3,Float64,9} # type of the value (3x3 tensor)
 
 basis = FixedPolynomialBasis{P,V}(filter,order)
