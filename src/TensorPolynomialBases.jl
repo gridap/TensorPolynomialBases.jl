@@ -23,8 +23,10 @@ import FixedPolynomials; const fp = FixedPolynomials
 using StaticArrays
 using TensorValues
 
-export FixedPolynomialBasis, ScratchData
-export FastQMonomials
+export ScratchData
+export TensorPolynomialBasis
+export FixedPolynomialBasis
+export QMonomialBasis
 export gradient_type, value_type, point_type
 export evaluate, gradient
 export evaluate!, gradient!
@@ -36,6 +38,6 @@ include("Interfaces.jl")
 
 include("FixedPolynomialBases.jl")
 
-include("FastQMonomials.jl")
+include("QMonomialBases.jl")
 
 end # module

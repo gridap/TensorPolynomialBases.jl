@@ -11,4 +11,8 @@ end
   include("FixedPolynomialBasesTests.jl")
 end
 
+@testset "QMonomialBasesTests" begin
+  include("QMonomialBasesTests.jl")
+end
+
 end # module TensorPolynomialBasesTests
