@@ -41,7 +41,7 @@ gradient!(v,basis,x,cache) # No memory allocation here
 @show v
 ```
 
-### Create a Tensor-valued monomial basis of the "serendipity" space in 3 variables (this time using the types of the `TensorValues.jl` package)
+### Create a Tensor-valued monomial basis of the "serendipity" space in 3 variables (this time using the types of the TensorValues package)
 
 ```julia
 using TensorValues
