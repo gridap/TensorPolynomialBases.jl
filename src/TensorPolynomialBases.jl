@@ -27,6 +27,7 @@ export ScratchData
 export TensorPolynomialBasis
 export FixedPolynomialBasis
 export QMonomialBasis
+export MonomialBasis
 export gradient_type, value_type, point_type
 export evaluate, gradient
 export evaluate!, gradient!
@@ -37,6 +38,8 @@ include("Utils.jl")
 include("Interfaces.jl")
 
 include("FixedPolynomialBases.jl")
+
+include("MonomialBases.jl")
 
 #include("QMonomialBases.jl")
 
