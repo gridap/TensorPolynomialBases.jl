@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.com/gridap/TensorPolynomialBases.jl.svg?branch=master)](https://travis-ci.com/gridap/TensorPolynomialBases.jl)
 [![Codecov](https://codecov.io/gh/gridap/TensorPolynomialBases.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/gridap/TensorPolynomialBases.jl)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://gridap.github.io/TensorPolynomialBases.jl/stable)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://gridap.github.io/TensorPolynomialBases.jl/latest)
 
 The **TensorPolynomialBases** package provides a collection of different types representing tensor-valued multivariate polynomial bases. It provides a common interface, called `TensorPolynomialBasis`, and several concrete implementations. At the moment, only a concrete implementation, called `MonomialBasis` is available, which implements a tensor-valued multivariate monomial basis. For representing the tensor values arising in the evaluation of tensor-valued polynomails, the user can either use the [StaticArrays](https://github.com/JuliaArrays/StaticArrays.jl) or the [TensorValues](https://github.com/gridap/TensorValues.jl) packages.
 
