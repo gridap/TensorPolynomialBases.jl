@@ -47,7 +47,6 @@ using Test
 
 export ScratchData
 export TensorPolynomialBasis
-export FixedPolynomialBasis
 export MonomialBasis
 export test_polynomial_basis_without_gradient
 export test_polynomial_basis
