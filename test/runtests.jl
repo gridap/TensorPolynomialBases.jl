@@ -7,10 +7,6 @@ using Test
   include("UtilsTests.jl")
 end
 
-#@testset "FixedPolynomialBasesTests" begin
-#  include("FixedPolynomialBasesTests.jl")
-#end
-
 @testset "InterfacesTests" begin
   include("InterfacesTests.jl")
 end

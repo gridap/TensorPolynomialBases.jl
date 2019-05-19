@@ -41,8 +41,6 @@ end
 
 ###
 
-using DynamicPolynomials: @polyvar
-import FixedPolynomials; const fp = FixedPolynomials
 using StaticArrays
 using TensorValues
 using Test
@@ -61,8 +59,6 @@ import Base: length, ndims
 include("Utils.jl")
 
 include("Interfaces.jl")
-
-include("FixedPolynomialBases.jl")
 
 include("MonomialBases.jl")
 
