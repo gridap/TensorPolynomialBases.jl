@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/gridap/TensorPolynomialBases.jl.svg?branch=master)](https://travis-ci.com/gridap/TensorPolynomialBases.jl)
 [![Codecov](https://codecov.io/gh/gridap/TensorPolynomialBases.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/gridap/TensorPolynomialBases.jl)
 
-The **TensorPolynomialBases** package provides a collection of different types representing tensor-valued multivariate polynomial bases. It provides a common interface, called `TensorPolynomialBasis`, and several concrete implementations. At the moment, only a concrete implementation, called `FixedPolynomialBasis`, which uses the [FixedPolynomials](https://github.com/JuliaAlgebra/FixedPolynomials.jl) package, is available. For representing the tensor values arising in the evaluation of tensor-valued polynomails, the user can either use the [StaticArrays](https://github.com/JuliaArrays/StaticArrays.jl) or the [TensorValues](https://github.com/gridap/TensorValues.jl) packages.
+The **TensorPolynomialBases** package provides a collection of different types representing tensor-valued multivariate polynomial bases. It provides a common interface, called `TensorPolynomialBasis`, and several concrete implementations. At the moment, only a concrete implementation, called `MonomialBasis` is available, which implements a tensor-valued multivariate monomial basis. For representing the tensor values arising in the evaluation of tensor-valued polynomails, the user can either use the [StaticArrays](https://github.com/JuliaArrays/StaticArrays.jl) or the [TensorValues](https://github.com/gridap/TensorValues.jl) packages.
 
 ## Quick start
 
@@ -20,7 +20,7 @@ order= 4
 P = SVector{2,Float64} # type of the evaluation point
 V = SVector{3,Float64} # type of the value
 
-basis = FixedPolynomialBasis{P,V}(filter,order)
+basis = MonomialBasis{P,V}(filter,order)
 
 # Create scratch data that can be reused between evaluations
 cache = ScratchData(basis)
@@ -53,7 +53,7 @@ order= 3
 P = VectorValue{3,Float64} # type of the evaluation point
 V = TensorValue{3,Float64,9} # type of the value (3x3 tensor)
 
-basis = FixedPolynomialBasis{P,V}(filter,order)
+basis = MonomialBasis{P,V}(filter,order)
 
 # Create scratch data that can be reused between evaluations
 cache = ScratchData(basis)
