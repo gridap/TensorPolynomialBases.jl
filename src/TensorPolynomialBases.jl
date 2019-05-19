@@ -1,5 +1,7 @@
 module TensorPolynomialBases
 
+### To be removed
+
 using TensorValues
 using StaticArrays
 import Base: convert
@@ -18,6 +20,8 @@ function LinearIndices(a::MultiValue)
   LinearIndices(a.array)
 end
 
+###
+
 using DynamicPolynomials: @polyvar
 import FixedPolynomials; const fp = FixedPolynomials
 using StaticArrays
@@ -26,7 +30,6 @@ using TensorValues
 export ScratchData
 export TensorPolynomialBasis
 export FixedPolynomialBasis
-export QMonomialBasis
 export MonomialBasis
 export gradient_type, value_type, point_type
 export evaluate, gradient
@@ -40,7 +43,5 @@ include("Interfaces.jl")
 include("FixedPolynomialBases.jl")
 
 include("MonomialBases.jl")
-
-#include("QMonomialBases.jl")
 
 end # module
