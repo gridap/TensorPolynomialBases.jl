@@ -2,9 +2,10 @@ using Documenter
 using TensorPolynomialBases
 
 makedocs(
-    sitename = "TensorPolynomialBases",
+    sitename = "TensorPolynomialBases.jl",
     format = Documenter.HTML(),
-    modules = [TensorPolynomialBases]
+    modules = [TensorPolynomialBases],
+    pages = ["Home" => "index.md","API"=>"pages/api.md"]
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.
