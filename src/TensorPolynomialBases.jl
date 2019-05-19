@@ -8,7 +8,7 @@ import Base: convert
 import Base: CartesianIndices
 import Base: LinearIndices
 
-function convert(::Type{<:MultiValue{S,T,N}},a::StaticArray{S,T,N}) where {S,T,N}
+function convert(::Type{<:MultiValue{S,T,N,L}},a::StaticArray{S,T,N}) where {S,T,N,L}
   MultiValue(a)
 end
 
@@ -20,17 +20,39 @@ function LinearIndices(a::MultiValue)
   LinearIndices(a.array)
 end
 
+import Base: length
+length(::Type{MultiValue{S,T,N,L}}) where {S,T,N,L} = L
+
+import Base: isapprox
+function isapprox(
+  a::AbstractArray{<:MultiValue}, b::AbstractArray{<:MultiValue})
+  if size(a) != size(b); return false; end
+  for (ai,bi) in zip(a,b)
+    if !(ai≈bi); return false; end
+  end
+  true
+end
+
+function convert(
+  ::Type{<:MultiValue{S,T,N,L}},a::AbstractArray{T,N}) where {S,T,N,L}
+  b = convert(SArray{S,T,N,L},a)
+  MultiValue(b)
+end
+
 ###
 
 using DynamicPolynomials: @polyvar
 import FixedPolynomials; const fp = FixedPolynomials
 using StaticArrays
 using TensorValues
+using Test
 
 export ScratchData
 export TensorPolynomialBasis
 export FixedPolynomialBasis
 export MonomialBasis
+export test_polynomial_basis_without_gradient
+export test_polynomial_basis
 export gradient_type, value_type, point_type
 export evaluate, gradient
 export evaluate!, gradient!

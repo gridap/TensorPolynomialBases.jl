@@ -7,12 +7,16 @@ using Test
   include("UtilsTests.jl")
 end
 
-@testset "FixedPolynomialBasesTests" begin
-  include("FixedPolynomialBasesTests.jl")
+#@testset "FixedPolynomialBasesTests" begin
+#  include("FixedPolynomialBasesTests.jl")
+#end
+
+@testset "InterfacesTests" begin
+  include("InterfacesTests.jl")
 end
 
-@testset "QMonomialBasesTests" begin
-  include("QMonomialBasesTests.jl")
+@testset "MonomialBasesTests" begin
+  include("MonomialBasesTests.jl")
 end
 
 end # module TensorPolynomialBasesTests
