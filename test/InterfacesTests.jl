@@ -12,6 +12,14 @@ order = 1
 basis = MonomialBasis{P,V}(filter,order)
 
 x = SVector(2.0,3.0)
+
+cache = ScratchData(basis)
+v = zeros(V,length(basis))
+g = zeros(G,length(basis))
+evaluate!(v,basis,x,cache)
+gradient!(g,basis,x,cache)
+test_polynomial_basis(basis,x,v,g)
+
 v = evaluate(basis,x)
 g = gradient(basis,x)
 test_polynomial_basis(basis,x,v,g)
