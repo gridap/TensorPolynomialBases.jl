@@ -9,6 +9,7 @@ TensorValues = "31c64edf-cdeb-50e4-845d-ed2334360c20"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
+julia = "1"
 StaticArrays = "0.10"
 TensorValues = "0.2"
 
