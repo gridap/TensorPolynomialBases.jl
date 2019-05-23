@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · TensorPolynomialBases.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>TensorPolynomialBases.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li class="current"><a class="toctext" href>Home</a><ul class="internal"><li><a class="toctext" href="#Quick-start-1">Quick start</a></li></ul></li><li><a class="toctext" href="pages/api/">API</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Home</a></li></ul><a class="edit-page" href="https://github.com/gridap/TensorPolynomialBases.jl/blob/master/docs/src/index.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Home</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="TensorPolynomialBases.jl-1" href="#TensorPolynomialBases.jl-1">TensorPolynomialBases.jl</a></h1><h2><a class="nav-anchor" id="Quick-start-1" href="#Quick-start-1">Quick start</a></h2><h3><a class="nav-anchor" id="Create-a-vector-valued-monomial-basis-of-P-polynomials-in-2-variables-1" href="#Create-a-vector-valued-monomial-basis-of-P-polynomials-in-2-variables-1">Create a vector-valued monomial basis of P-polynomials in 2 variables</a></h3><pre><code class="language-julia">using TensorPolynomialBases
+using StaticArrays
+
+# Define a filter to select the monomials in the P-space
+filter(e,order) = sum(e) &lt;= order
+
+order= 4
+P = SVector{2,Float64} # type of the evaluation point
+V = SVector{3,Float64} # type of the value
+
+basis = MonomialBasis{P,V}(filter,order)
+
+# Create scratch data that can be reused between evaluations
+cache = ScratchData(basis)
+
+# Evaluation point
+x = @SVector rand(3)
+
+# Evaluation
+v = zeros(V,length(basis))
+evaluate!(v,basis,x,cache) # No memory allocation here
+@show v
+
+# Evaluation of the gradient
+G = gradient_type(basis)
+# G == SMatrix{2,3,T,6}
+v = zeros(G,length(basis))
+gradient!(v,basis,x,cache) # No memory allocation here
+@show v</code></pre><h3><a class="nav-anchor" id="Create-a-Tensor-valued-monomial-basis-of-the-&quot;serendipity&quot;-space-in-3-variables-(this-time-using-the-types-of-the-TensorValues-package)-1" href="#Create-a-Tensor-valued-monomial-basis-of-the-&quot;serendipity&quot;-space-in-3-variables-(this-time-using-the-types-of-the-TensorValues-package)-1">Create a Tensor-valued monomial basis of the &quot;serendipity&quot; space in 3 variables (this time using the types of the TensorValues package)</a></h3><pre><code class="language-julia">using TensorValues
+
+# Define the filter for the serendipity space
+filter(e,order) = sum( ( i for i in e if i&gt;1 ) ) &lt;= order
+
+order= 3
+P = VectorValue{3,Float64} # type of the evaluation point
+V = TensorValue{3,Float64,9} # type of the value (3x3 tensor)
+
+basis = MonomialBasis{P,V}(filter,order)
+
+# Create scratch data that can be reused between evaluations
+cache = ScratchData(basis)
+
+# Evaluation point
+x = VectorValue(0.1,2.0,3.1)
+
+# Evaluation
+v = zeros(V,length(basis))
+evaluate!(v,basis,x,cache) # No memory allocation here
+@show v
+</code></pre><footer><hr/><a class="next" href="pages/api/"><span class="direction">Next</span><span class="title">API</span></a></footer></article></body></html>
