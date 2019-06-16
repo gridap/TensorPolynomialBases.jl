@@ -54,6 +54,16 @@ basis = MonomialBasis{P,V}(filter,order)
 x = VectorValue(2,3)
 test_polynomial_basis(basis,x,v,g)
 
+# Q space with isotropic order
+
+P = VectorValue{2}
+V = VectorValue{3,Float64}
+orders = (1,1,1)
+basis = MonomialBasis{P,V}(orders)
+
+x = VectorValue(2.0,3.0)
+test_polynomial_basis(basis,x,v,g)
+
 # For Reals (SVector point)
 
 P = SVector{2,Float64}
@@ -111,5 +121,6 @@ g = G[[0.0 0.0 0.0; 0.0 0.0 0.0], [0.0 0.0 0.0; 0.0 0.0 0.0],
 
 x = SVector(2.0,3.0)
 test_polynomial_basis(basis,x,v,g)
+
 
 end # module MonomialBasesTests
