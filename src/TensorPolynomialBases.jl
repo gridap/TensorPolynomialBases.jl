@@ -4,6 +4,13 @@ using StaticArrays
 using TensorValues
 using Test
 
+# TODO to be moved to tensorValues (begin)
+#
+import Base.length
+length(::Type{<: MultiValue{S,T,N,L} where {S,T,N}}  ) where L = L
+
+# (end)
+
 export ScratchData
 export TensorPolynomialBasis
 export MonomialBasis

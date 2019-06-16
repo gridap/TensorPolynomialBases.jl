@@ -18,6 +18,13 @@ function (::Type{MonomialBasis{P,V}})(filter::Function,order::Int) where {P,V}
   MonomialBasis{P,V,G,D}(terms,order)
 end
 
+function (::Type{MonomialBasis{P,V}})(orders::NTuple{N,Int}) where {P,V,N}
+  @assert N>0
+  o1 = orders[1]
+  @notimplementedif any( [o != o1 for o in orders] )
+  MonomialBasis{P,V}(_q_filter,o1)
+end
+
 # Implementation of the interface
 
 length(b::MonomialBasis{P,V}) where {P,V} = _length(V)*length(b.terms)
@@ -50,6 +57,8 @@ function gradient!(
 end
 
 # Helpers
+
+_q_filter(e,o) = true
 
 function _define_terms(filter,order,dim)
   n1d = order+1

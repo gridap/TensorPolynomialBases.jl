@@ -46,6 +46,14 @@ g = reinterpret(G,g)
 x = VectorValue(2.0,3.0)
 test_polynomial_basis(basis,x,v,g)
 
+# Idem but with a wither set of inputs
+
+P = VectorValue{2}
+basis = MonomialBasis{P,V}(filter,order)
+
+x = VectorValue(2,3)
+test_polynomial_basis(basis,x,v,g)
+
 # For Reals (SVector point)
 
 P = SVector{2,Float64}
