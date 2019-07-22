@@ -1,31 +1,31 @@
 
 # Types and constructors
 
-struct QGradMonomialBasis{P,G,D} <: TensorPolynomialBasis{P,P,G}
+struct QGradMonomialBasis{P,V,G,D} <: TensorPolynomialBasis{P,V,G}
   order::Int
   terms::CartesianIndices{D}
   perms::Matrix{Int}
 end
 
-function (::Type{QGradMonomialBasis{P}})(order::Int) where P
+function (::Type{QGradMonomialBasis{P,V}})(order::Int) where {P,V}
   D = _length(P)
-  G = _gradient_type(P,P)
+  @assert _length(V) == D
+  G = _gradient_type(V,P)
   n1d = order+1
   t = fill(n1d,D)
   t[1] = order
   terms = CartesianIndices(tuple(t...))
   perms = _prepare_perms(D)
-  QGradMonomialBasis{P,G,D}(order,terms,perms)
+  QGradMonomialBasis{P,V,G,D}(order,terms,perms)
 end
 
 # Implementation of the interface
 
-length(b::QGradMonomialBasis{P,G,D}) where {P,G,D} = D*b.order*(b.order+1)^(D-1)
+length(b::QGradMonomialBasis{P,V,G,D}) where {P,V,G,D} = D*b.order*(b.order+1)^(D-1)
 
-ndims(b::QGradMonomialBasis{P,G,D}) where {P,G,D} = D
+ndims(b::QGradMonomialBasis{P,V,G,D}) where {P,V,G,D} = D
 
-function ScratchData(b::QGradMonomialBasis{P}) where P
-  V = P
+function ScratchData(b::QGradMonomialBasis{P,V}) where {P,V}
   T = eltype(V)
   dim = _length(P)
   n1d = b.order+1
@@ -35,19 +35,18 @@ function ScratchData(b::QGradMonomialBasis{P}) where P
 end
 
 function evaluate!(
-  v::AbstractVector{P},
-  b::QGradMonomialBasis{P,G,D},
+  v::AbstractVector{V},
+  b::QGradMonomialBasis{P,V,G,D},
   x::P,
-  cache::MonomialBasisCache) where {P,G,D}
+  cache::MonomialBasisCache) where {P,V,G,D}
   _evaluate_nd_qgrad!(v,x,b.order,b.terms,b.perms,cache.c)
 end
 
 function gradient!(
   v::AbstractVector{G},
-  b::QGradMonomialBasis{P,G,D},
+  b::QGradMonomialBasis{P,V,G,D},
   x::P,
-  cache::MonomialBasisCache) where {P,G,D}
-  V = P
+  cache::MonomialBasisCache) where {P,V,G,D}
   _gradient_nd_qgrad!(v,x,b.order,b.terms,b.perms,cache.c,cache.g,V)
 end
 
