@@ -51,9 +51,9 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[TensorValues]]
 deps = ["LinearAlgebra", "StaticArrays"]
-git-tree-sha1 = "057e34fa9adeaa725391c311ac0ec22c1e429a9d"
+git-tree-sha1 = "9d192922681bdc4f3294b5d565d2d4b37d21fa18"
 uuid = "31c64edf-cdeb-50e4-845d-ed2334360c20"
-version = "0.3.1"
+version = "0.3.3"
 
 [[Test]]
 deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]

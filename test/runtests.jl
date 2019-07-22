@@ -15,4 +15,8 @@ end
   include("MonomialBasesTests.jl")
 end
 
-end # module TensorPolynomialBasesTests
+@testset "QGradMonomialBasesTests" begin
+  include("QGradMonomialBasesTests.jl")
+end
+
+end # module
