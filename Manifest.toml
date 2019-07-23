@@ -52,8 +52,6 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 [[TensorValues]]
 deps = ["LinearAlgebra", "StaticArrays"]
 git-tree-sha1 = "a998c534421283d1ad7cec699964600223be5357"
-repo-rev = "master"
-repo-url = "https://github.com/gridap/TensorValues.jl.git"
 uuid = "31c64edf-cdeb-50e4-845d-ed2334360c20"
 version = "0.3.4"
 
