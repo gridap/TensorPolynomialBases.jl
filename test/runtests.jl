@@ -19,4 +19,8 @@ end
   include("QGradMonomialBasesTests.jl")
 end
 
+@testset "QCurlGradMonomialBasesTests" begin
+  include("QCurlGradMonomialBasesTests.jl")
+end
+
 end # module

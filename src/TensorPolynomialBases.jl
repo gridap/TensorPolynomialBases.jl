@@ -8,6 +8,7 @@ export ScratchData
 export TensorPolynomialBasis
 export MonomialBasis
 export QGradMonomialBasis
+export QCurlGradMonomialBasis
 export test_polynomial_basis_without_gradient
 export test_polynomial_basis
 export gradient_type, value_type, point_type
@@ -22,5 +23,7 @@ include("Interfaces.jl")
 include("MonomialBases.jl")
 
 include("QGradMonomialBases.jl")
+
+include("QCurlGradMonomialBases.jl")
 
 end # module
