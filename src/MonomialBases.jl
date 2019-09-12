@@ -3,7 +3,7 @@
 
 struct MonomialBasis{P,V,G,D} <: TensorPolynomialBasis{P,V,G}
   terms::Vector{CartesianIndex{D}}
-  order::Int
+  orders::NTuple{D,Int}
 end
 
 struct MonomialBasisCache{T}
@@ -15,14 +15,16 @@ function (::Type{MonomialBasis{P,V}})(filter::Function,order::Int) where {P,V}
   D = _length(P)
   terms = _define_terms(filter,order,D)
   G = _gradient_type(V,P)
-  MonomialBasis{P,V,G,D}(terms,order)
+  orders = tuple(fill(order,D)...)
+  MonomialBasis{P,V,G,D}(terms,orders)
 end
 
 function (::Type{MonomialBasis{P,V}})(orders::NTuple{N,Int}) where {P,V,N}
-  @assert N>0
-  o1 = orders[1]
-  @notimplementedif any( [o != o1 for o in orders] )
-  MonomialBasis{P,V}(_q_filter,o1)
+  terms = [ ci for ci in CartesianIndices(orders.+1) if true]
+  D = _length(P)
+  @assert D == N
+  G = _gradient_type(V,P)
+  MonomialBasis{P,V,G,D}(terms,orders)
 end
 
 # Implementation of the interface
@@ -34,7 +36,7 @@ ndims(b::MonomialBasis{P}) where P = _length(P)
 function ScratchData(b::MonomialBasis{P,V}) where {P,V}
   T = eltype(V)
   dim = _length(P)
-  n1d = b.order+1
+  n1d = maximum(b.orders.+1)
   c = zeros(dim,n1d)
   g = zeros(dim,n1d)
   MonomialBasisCache{T}(c,g)
@@ -45,7 +47,7 @@ function evaluate!(
   b::MonomialBasis{P,V},
   x::P,
   cache::MonomialBasisCache) where {P,V}
-  _evaluate_nd!(v,x,b.order,b.terms,cache.c)
+  _evaluate_nd!(v,x,b.orders,b.terms,cache.c)
 end
 
 function gradient!(
@@ -53,7 +55,7 @@ function gradient!(
   b::MonomialBasis{P,V,G},
   x::P,
   cache::MonomialBasisCache) where {P,V,G}
-  _gradient_nd!(v,x,b.order,b.terms,cache.c,cache.g,V)
+  _gradient_nd!(v,x,b.orders,b.terms,cache.c,cache.g,V)
 end
 
 # Helpers
@@ -90,13 +92,13 @@ end
 function _evaluate_nd!(
   v::AbstractVector{V},
   x,
-  order,
+  orders,
   terms::AbstractVector{CartesianIndex{D}},
   c::AbstractMatrix{T}) where {V,T,D}
 
   dim = D
   for d in 1:dim
-    _evaluate_1d!(c,x,order,d)
+    _evaluate_1d!(c,x,orders[d],d)
   end
 
   o = one(T)
@@ -138,7 +140,7 @@ end
 function _gradient_nd!(
   v::AbstractVector{G},
   x,
-  order,
+  orders,
   terms::AbstractVector{CartesianIndex{D}},
   c::AbstractMatrix{T},
   g::AbstractMatrix{T},
@@ -146,8 +148,8 @@ function _gradient_nd!(
 
   dim = D
   for d in 1:dim
-    _evaluate_1d!(c,x,order,d)
-    _gradient_1d!(g,x,order,d)
+    _evaluate_1d!(c,x,orders[d],d)
+    _gradient_1d!(g,x,orders[d],d)
   end
 
   z = zero(MVector{D,T})

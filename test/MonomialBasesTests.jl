@@ -58,10 +58,31 @@ test_polynomial_basis(basis,x,v,g)
 
 P = VectorValue{2}
 V = VectorValue{3,Float64}
-orders = (1,1,1)
+orders = (1,1)
 basis = MonomialBasis{P,V}(orders)
 
 x = VectorValue(2.0,3.0)
+test_polynomial_basis(basis,x,v,g)
+
+# Q space with an-isotropic order
+P = VectorValue{2}
+V = VectorValue{2,Float64}
+orders = (1,2)
+basis = MonomialBasis{P,V}(orders)
+G = gradient_type(basis)
+
+x = VectorValue(2.0,3.0)
+v = V[
+ (1.0, 0.0), (0.0, 1.0), (2.0, 0.0), (0.0, 2.0),
+ (3.0, 0.0), (0.0, 3.0), (6.0, 0.0), (0.0, 6.0),
+ (9.0, 0.0), (0.0, 9.0), (18.0, 0.0), (0.0, 18.0)]
+g = G[
+  (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0),
+  (1.0, 0.0, 0.0, 0.0), (0.0, 0.0, 1.0, 0.0),
+  (0.0, 1.0, 0.0, 0.0), (0.0, 0.0, 0.0, 1.0),
+  (3.0, 2.0, 0.0, 0.0), (0.0, 0.0, 3.0, 2.0),
+  (0.0, 6.0, 0.0, 0.0), (0.0, 0.0, 0.0, 6.0),
+  (9.0, 12.0, 0.0, 0.0), (0.0, 0.0, 9.0, 12.0)]
 test_polynomial_basis(basis,x,v,g)
 
 # For Reals (SVector point)
